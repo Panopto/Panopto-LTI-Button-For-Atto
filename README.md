@@ -1,4 +1,4 @@
-# Panopto-LTI-Button-For-Atto-Dev
+# Panopto-LTI-Button-For-Atto
  This plugin adds a button to the Atto Text Editor to allow for teachers and students to embed Panopto content using existing Panopto LTI tools
 
 
