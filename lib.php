@@ -73,6 +73,7 @@ function atto_panoptoltibutton_params_for_js($elementid, $options, $fpoptions) {
     return [
         'toolTypes' => $tooltypes,
         'course' => $PAGE->course,
+        'wwwroot' => $CFG->wwwroot,
         'resourcebase' => sha1(
             $PAGE->url->__toString() . '&' . $PAGE->course->sortorder
                 . '&' . $PAGE->course->timecreated

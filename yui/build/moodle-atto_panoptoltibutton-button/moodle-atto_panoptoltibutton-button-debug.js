@@ -36,7 +36,7 @@ YUI.add('moodle-atto_panoptoltibutton-button', function (Y, NAME) {
 
 Y.namespace('M.atto_panoptoltibutton').PlacementStrategyFactory = function () {
 
-    this.strategyFor = function (item, course, resourceLinkId, tool) {
+    this.strategyFor = function (item, course, resourceLinkId, tool, wwwroot) {
 
         var StrategyClass = Y.M.atto_panoptoltibutton.EmbeddedContentRenderingStrategy;
 
@@ -65,14 +65,14 @@ Y.namespace('M.atto_panoptoltibutton').PlacementStrategyFactory = function () {
             }
         }
 
-        var strategy = new StrategyClass(item, course, resourceLinkId, tool);
+        var strategy = new StrategyClass(item, course, resourceLinkId, tool, wwwroot);
 
         return strategy;
     };
 };
 
 Y.namespace('M.atto_panoptoltibutton').EmbeddedContentRenderingStrategy = function (item,
-        course, resourceLinkId, tool) {
+        course, resourceLinkId, tool, wwwroot) {
 
     var mimeTypePieces = item.mediaType.split('/'),
         mimeTypeType = mimeTypePieces[0],
@@ -113,7 +113,7 @@ Y.namespace('M.atto_panoptoltibutton').EmbeddedContentRenderingStrategy = functi
 
 
     TEMPLATES = {
-        ltiLink: Y.Handlebars.compile('<iframe src="/lib/editor/atto/plugins/panoptoltibutton/view.php?custom={{custom}}&'
+        ltiLink: Y.Handlebars.compile('<iframe src="' + wwwroot + '/lib/editor/atto/plugins/panoptoltibutton/view.php?custom={{custom}}&'
             + 'course={{course.id}}&ltitypeid={{toolid}}&resourcelinkid={{resourcelinkid}}'
             + '{{#if item.url}}&contenturl={{item.url}}{{/if}}'
             + '" '
@@ -124,7 +124,7 @@ Y.namespace('M.atto_panoptoltibutton').EmbeddedContentRenderingStrategy = functi
         link: Y.Handlebars.compile('<div style="' 
                     + (item.displayWidth ? 'width:{{item.displayWidth}};' : '')
                     + 'height:{{titleHeight}};">'
-                    + '<a href="/lib/editor/atto/plugins/panoptoltibutton/view.php?custom={{custom}}&'
+                    + '<a href="' + wwwroot + '/lib/editor/atto/plugins/panoptoltibutton/view.php?custom={{custom}}&'
                     + 'course={{course.id}}&ltitypeid={{toolid}}&resourcelinkid={{resourcelinkid}}'
                     + '{{#if item.url}}&contenturl={{item.url}}{{/if}}'
                     + '" '
@@ -190,7 +190,7 @@ Y.namespace('M.atto_panoptoltibutton').EmbeddedContentRenderingStrategy = functi
 };
 
 Y.namespace('M.atto_panoptoltibutton').IframeRenderingStrategy = function (item, course,
-        resourceLinkId, tool) {
+        resourceLinkId, tool, wwwroot) {
 
     var template;
 
@@ -201,7 +201,7 @@ Y.namespace('M.atto_panoptoltibutton').IframeRenderingStrategy = function (item,
         item.useCustomUrl = true;
     }
 
-    template = Y.Handlebars.compile('<iframe src="/lib/editor/atto/plugins/panoptoltibutton/view.php?course={{courseId}}'
+    template = Y.Handlebars.compile('<iframe src="' + wwwroot + '/lib/editor/atto/plugins/panoptoltibutton/view.php?course={{courseId}}'
             + '&ltitypeid={{ltiTypeId}}&custom={{custom}}'
             + '{{#if item.useCustomUrl}}&contenturl={{item.url}}{{/if}}'
             + '&resourcelinkid={{resourcelinkid}}" '
@@ -290,6 +290,7 @@ Y.namespace('M.atto_panoptoltibutton').Button = Y.Base.create('button', Y.M.edit
             host = this.get('host'),
             panel,
             courseid = this._course;
+            wwwroot = this._wwwroot;
 
         document.CALLBACKS['f' + resourceLinkId] = function (contentItemData) {
             if (!contentItemData) {
@@ -299,7 +300,7 @@ Y.namespace('M.atto_panoptoltibutton').Button = Y.Base.create('button', Y.M.edit
             for (var i = 0; i < contentItemData['@graph'].length; i++) {
                 var item = contentItemData['@graph'][i];
                 var strategyFactory = new Y.M.atto_panoptoltibutton.PlacementStrategyFactory();
-                var strategy = strategyFactory.strategyFor(item, courseid, resourceLinkId, tool);
+                var strategy = strategyFactory.strategyFor(item, courseid, resourceLinkId, tool, wwwroot);
                 var render = strategy.toHtml;
                 host.insertContentAtFocusPoint(render(item));
             }
@@ -310,7 +311,7 @@ Y.namespace('M.atto_panoptoltibutton').Button = Y.Base.create('button', Y.M.edit
         };
 
         this._panel = new M.core.dialogue({
-            bodyContent: '<iframe src="' + this._CONTENT_ITEM_SELECTION_URL +
+            bodyContent: '<iframe src="' + wwwroot + this._CONTENT_ITEM_SELECTION_URL +
                 '?course=' + this._course.id +
                 '&id=' + tool.id +
                 '&callback=f' + resourceLinkId +
@@ -337,6 +338,7 @@ Y.namespace('M.atto_panoptoltibutton').Button = Y.Base.create('button', Y.M.edit
         }
 
         this._course = args.course;
+        this._wwwroot = args.wwwroot;
 
         this._createResourceLinkId = (function (base) {
             return function () {

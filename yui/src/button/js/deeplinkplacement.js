@@ -34,7 +34,7 @@
 
 Y.namespace('M.atto_panoptoltibutton').PlacementStrategyFactory = function () {
 
-    this.strategyFor = function (item, course, resourceLinkId, tool) {
+    this.strategyFor = function (item, course, resourceLinkId, tool, wwwroot) {
 
         var StrategyClass = Y.M.atto_panoptoltibutton.EmbeddedContentRenderingStrategy;
 
@@ -63,14 +63,14 @@ Y.namespace('M.atto_panoptoltibutton').PlacementStrategyFactory = function () {
             }
         }
 
-        var strategy = new StrategyClass(item, course, resourceLinkId, tool);
+        var strategy = new StrategyClass(item, course, resourceLinkId, tool, wwwroot);
 
         return strategy;
     };
 };
 
 Y.namespace('M.atto_panoptoltibutton').EmbeddedContentRenderingStrategy = function (item,
-        course, resourceLinkId, tool) {
+        course, resourceLinkId, tool, wwwroot) {
 
     var mimeTypePieces = item.mediaType.split('/'),
         mimeTypeType = mimeTypePieces[0],
@@ -111,7 +111,7 @@ Y.namespace('M.atto_panoptoltibutton').EmbeddedContentRenderingStrategy = functi
 
 
     TEMPLATES = {
-        ltiLink: Y.Handlebars.compile('<iframe src="/lib/editor/atto/plugins/panoptoltibutton/view.php?custom={{custom}}&'
+        ltiLink: Y.Handlebars.compile('<iframe src="' + wwwroot + '/lib/editor/atto/plugins/panoptoltibutton/view.php?custom={{custom}}&'
             + 'course={{course.id}}&ltitypeid={{toolid}}&resourcelinkid={{resourcelinkid}}'
             + '{{#if item.url}}&contenturl={{item.url}}{{/if}}'
             + '" '
@@ -122,7 +122,7 @@ Y.namespace('M.atto_panoptoltibutton').EmbeddedContentRenderingStrategy = functi
         link: Y.Handlebars.compile('<div style="' 
                     + (item.displayWidth ? 'width:{{item.displayWidth}};' : '')
                     + 'height:{{titleHeight}};">'
-                    + '<a href="/lib/editor/atto/plugins/panoptoltibutton/view.php?custom={{custom}}&'
+                    + '<a href="' + wwwroot + '/lib/editor/atto/plugins/panoptoltibutton/view.php?custom={{custom}}&'
                     + 'course={{course.id}}&ltitypeid={{toolid}}&resourcelinkid={{resourcelinkid}}'
                     + '{{#if item.url}}&contenturl={{item.url}}{{/if}}'
                     + '" '
@@ -188,7 +188,7 @@ Y.namespace('M.atto_panoptoltibutton').EmbeddedContentRenderingStrategy = functi
 };
 
 Y.namespace('M.atto_panoptoltibutton').IframeRenderingStrategy = function (item, course,
-        resourceLinkId, tool) {
+        resourceLinkId, tool, wwwroot) {
 
     var template;
 
@@ -199,7 +199,7 @@ Y.namespace('M.atto_panoptoltibutton').IframeRenderingStrategy = function (item,
         item.useCustomUrl = true;
     }
 
-    template = Y.Handlebars.compile('<iframe src="/lib/editor/atto/plugins/panoptoltibutton/view.php?course={{courseId}}'
+    template = Y.Handlebars.compile('<iframe src="' + wwwroot + '/lib/editor/atto/plugins/panoptoltibutton/view.php?course={{courseId}}'
             + '&ltitypeid={{ltiTypeId}}&custom={{custom}}'
             + '{{#if item.useCustomUrl}}&contenturl={{item.url}}{{/if}}'
             + '&resourcelinkid={{resourcelinkid}}" '

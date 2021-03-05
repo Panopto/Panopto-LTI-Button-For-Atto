@@ -67,6 +67,7 @@ Y.namespace('M.atto_panoptoltibutton').Button = Y.Base.create('button', Y.M.edit
             host = this.get('host'),
             panel,
             courseid = this._course;
+            wwwroot = this._wwwroot;
 
         document.CALLBACKS['f' + resourceLinkId] = function (contentItemData) {
             if (!contentItemData) {
@@ -76,7 +77,7 @@ Y.namespace('M.atto_panoptoltibutton').Button = Y.Base.create('button', Y.M.edit
             for (var i = 0; i < contentItemData['@graph'].length; i++) {
                 var item = contentItemData['@graph'][i];
                 var strategyFactory = new Y.M.atto_panoptoltibutton.PlacementStrategyFactory();
-                var strategy = strategyFactory.strategyFor(item, courseid, resourceLinkId, tool);
+                var strategy = strategyFactory.strategyFor(item, courseid, resourceLinkId, tool, wwwroot);
                 var render = strategy.toHtml;
                 host.insertContentAtFocusPoint(render(item));
             }
@@ -87,7 +88,7 @@ Y.namespace('M.atto_panoptoltibutton').Button = Y.Base.create('button', Y.M.edit
         };
 
         this._panel = new M.core.dialogue({
-            bodyContent: '<iframe src="' + this._CONTENT_ITEM_SELECTION_URL +
+            bodyContent: '<iframe src="' + wwwroot + this._CONTENT_ITEM_SELECTION_URL +
                 '?course=' + this._course.id +
                 '&id=' + tool.id +
                 '&callback=f' + resourceLinkId +
@@ -114,6 +115,7 @@ Y.namespace('M.atto_panoptoltibutton').Button = Y.Base.create('button', Y.M.edit
         }
 
         this._course = args.course;
+        this._wwwroot = args.wwwroot;
 
         this._createResourceLinkId = (function (base) {
             return function () {
