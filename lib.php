@@ -64,7 +64,8 @@ function atto_panoptoltibutton_params_for_js($elementid, $options, $fpoptions) {
             ]
         );
 
-        if (!empty($targetservername) && strpos($type->config['toolurl'], $targetservername) !== false) {
+        if (!empty($targetservername) && strpos($type->config['toolurl'], $targetservername) !== false && 
+                $type->state == LTI_TOOL_STATE_CONFIGURED) {
             $tooltypes[] = $type;
         }
     }

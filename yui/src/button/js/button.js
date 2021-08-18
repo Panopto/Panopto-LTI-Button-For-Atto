@@ -55,9 +55,7 @@ require(['core/str'], function (str) {
 });
 
 Y.namespace('M.atto_panoptoltibutton').Button = Y.Base.create('button', Y.M.editor_atto.EditorPlugin, [], {
-
-    _CREATEACTIVITYURL: '/lib/editor/atto/plugins/panoptoltibutton/view.php',
-    _CONTENT_ITEM_SELECTION_URL: '/lib/editor/atto/plugins/panoptoltibutton/contentitem.php',
+    _CONTENT_ITEM_SELECTION_URL: M.cfg.wwwroot + '/lib/editor/atto/plugins/panoptoltibutton/contentitem.php',
 
     _panel: null,
 
@@ -114,6 +112,7 @@ Y.namespace('M.atto_panoptoltibutton').Button = Y.Base.create('button', Y.M.edit
         }
 
         this._course = args.course;
+
 
         this._createResourceLinkId = (function (base) {
             return function () {

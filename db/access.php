@@ -15,15 +15,22 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package    atto_panoptoltibutton
- * @copyright  2020 Panopto
- * @author     Panopto
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * Access script defining capabilities for the Panopto Student Submission tool
+ *
+ * @package attopanoptoltibutton
+ * @copyright  Panopto 2021
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['erroroccurred'] = 'An error occurred adding this content';
-$string['lti'] = 'lti';
-$string['pluginname'] = 'Panopto LTI';
-$string['invalid_content_host'] = "The host for the target content must match one of the Panopto servers configured in the Panopto block for Moodle.";
-$string['privacy:metadata'] = 'The atto_panoptoltibutton plugin does not store any personal data';
-$string['panoptoltibutton:view'] = 'Allows enroled users to view Panopto LTI Button for Atto content embedded in courses';
+$capabilities = array(
+    'atto/panoptoltibutton:view' => array(
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes' => array(
+            'teacher' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW,
+            'student' => CAP_ALLOW
+        )
+    )
+);
