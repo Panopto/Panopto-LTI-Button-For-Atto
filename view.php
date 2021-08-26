@@ -60,12 +60,7 @@ function init_panoptoltibutton_view() {
         $ltitypeid = required_param('ltitypeid', PARAM_INT);
         $customdata = optional_param('custom', '', PARAM_RAW_TRIMMED);
 
-        // If this lti embed is not placed in the course level context area assume its placed in an area whre it should be publicly viewable by anyone with the link.
-        if (!empty($COURSE->id)) {
-            $context = context_course::instance($COURSE->id);
-            require_login($COURSE->id);
-            require_capability('atto/panoptoltibutton:view', $context);
-        }
+        require_login();
 
         // Make sure $ltitypeid is valid.
         $ltitype = $DB->get_record('lti_types', ['id' => $ltitypeid], '*', MUST_EXIST);

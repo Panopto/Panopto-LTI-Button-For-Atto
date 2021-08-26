@@ -26,7 +26,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version    = 2021081800;
+$plugin->version    = 2021082500;
 $plugin->requires   = 2017110800;
 $plugin->component  = 'atto_panoptoltibutton';
 $plugin->dependencies = array(
