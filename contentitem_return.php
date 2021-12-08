@@ -24,7 +24,7 @@
  */
 
 require_once(dirname(__FILE__) . '/../../../../../config.php');
-require_once(dirname(__FILE__) . '/lib/panopto_lti_utility.php');
+require_once(dirname(__FILE__) . '/lib/panoptoltibutton_lti_utility.php');
 
 
 $courseid = required_param('course', PARAM_INT);
@@ -36,7 +36,7 @@ require_login($courseid);
 $context = context_course::instance($courseid);
 
 // Students will access this tool for the student submission workflow. Assume student can submit an assignment?
-if (!\panopto_lti_utility::panoptoltibutton_is_active_user_enrolled($context)) {
+if (!\panoptoltibutton_lti_utility::is_active_user_enrolled($context)) {
     require_capability('moodle/course:manageactivities', $context);
     require_capability('mod/lti:addcoursetool', $context);
 }

@@ -32,7 +32,7 @@ function init_panoptoltibutton_view() {
     require_once($CFG->libdir .'/accesslib.php'); // Access control functions
     require_once($CFG->dirroot . '/mod/lti/lib.php');
     require_once($CFG->dirroot . '/mod/lti/locallib.php');
-    require_once(dirname(__FILE__) . '/lib/panopto_lti_utility.php');
+    require_once(dirname(__FILE__) . '/lib/panoptoltibutton_lti_utility.php');
 
     $contenturl = optional_param('contenturl', '', PARAM_URL);
     
@@ -82,7 +82,7 @@ function init_panoptoltibutton_view() {
             }
         }
         
-        \panopto_lti_utility::panoptoltibutton_launch_tool($lti);
+        \panoptoltibutton_lti_utility::launch_tool($lti);
     } else {
         echo get_string('invalid_content_host', 'atto_panoptoltibutton');
     }

@@ -21,7 +21,7 @@
  * @copyright  Panopto 2020
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class panopto_lti_utility {
+class panoptoltibutton_lti_utility {
 
     /**
      * Launch an external tool activity.
@@ -29,8 +29,8 @@ class panopto_lti_utility {
      * @param  stdClass $instance the external tool activity settings
      * @return string The HTML code containing the javascript code for the launch
      */
-    public static function panoptoltibutton_launch_tool($instance) {
-        list($endpoint, $parms) = panopto_lti_utility::panoptoltibutton_get_launch_data($instance);
+    public static function launch_tool($instance) {
+        list($endpoint, $parms) = panoptoltibutton_lti_utility::get_launch_data($instance);
 
         $debuglaunch = ( $instance->debuglaunch == 1 );
 
@@ -47,7 +47,7 @@ class panopto_lti_utility {
      * @return array the endpoint URL and parameters (including the signature)
      * @since  Moodle 3.0
      */
-    private static function panoptoltibutton_get_launch_data($instance, $nonce = '') {
+    private static function get_launch_data($instance, $nonce = '') {
         global $PAGE, $CFG, $USER;
 
         if (empty($CFG)) {
@@ -272,7 +272,7 @@ class panopto_lti_utility {
         return array($endpoint, $parms);
     }
 
-    public static function panoptoltibutton_is_active_user_enrolled($targetcontext) {
+    public static function is_active_user_enrolled($targetcontext) {
         global $USER; 
 
         return is_enrolled($targetcontext, $USER, 'mod/assignment:submit');
