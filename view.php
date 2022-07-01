@@ -67,6 +67,20 @@ function init_panoptoltibutton_view() {
 
         $lti = new stdClass();
 
+        // Try to detect if we are viewing content from an iframe nested in course, get the Id param if it exists.
+        if (!empty($_SERVER['HTTP_REFERER']) && (strpos($_SERVER['HTTP_REFERER'], "/course/view.php") !== false)) {
+            $components = parse_url($_SERVER['HTTP_REFERER']);
+            parse_str($components['query'], $results);
+
+            if (!empty($results['id'])) {
+                $lti->course = $results['id'];
+                $course = $DB->get_record('course', array('id' => $results['id']), '*', MUST_EXIST);
+                $context = context_course::instance($results['id']);
+                $PAGE->set_context($context);
+                require_login($course, true);
+            }
+        }
+
         $lti->id = $resourcelinkid;
         $lti->typeid = $ltitypeid;
         $lti->launchcontainer = LTI_LAUNCH_CONTAINER_WINDOW;
