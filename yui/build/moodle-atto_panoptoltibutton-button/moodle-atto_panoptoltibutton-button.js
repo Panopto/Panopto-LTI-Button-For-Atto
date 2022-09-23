@@ -119,6 +119,7 @@ Y.namespace('M.atto_panoptoltibutton').EmbeddedContentRenderingStrategy = functi
             + '" '
             + '{{#if item.placementAdvice.width}} width="{{item.placementAdvice.displayWidth}}"{{/if}} '
             + '{{#if item.placementAdvice.height}} height="{{item.placementAdvice.displayHeight}}"{{/if}} '
+            + 'allowfullscreen="true" '
             + '/>'
         ),
         link: Y.Handlebars.compile('<div style="' 
@@ -207,6 +208,7 @@ Y.namespace('M.atto_panoptoltibutton').IframeRenderingStrategy = function (item,
             + '&resourcelinkid={{resourcelinkid}}" '
             + ' {{#if item.placementAdvice.displayWidth}}width="{{item.placementAdvice.displayWidth}}" {{/if}}'
             + ' {{#if item.placementAdvice.displayHeight}}height="{{item.placementAdvice.displayHeight}}" {{/if}}'
+            + 'allowfullscreen="true" '
             + '></iframe>'
             );
 
