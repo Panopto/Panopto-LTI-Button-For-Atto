@@ -110,7 +110,7 @@ Y.namespace('M.atto_panoptoltibutton').EmbeddedContentRenderingStrategy = functi
         titleHeight = parseInt(item.thumbnail.height) + "px";
 
         // LTI 1.3 sends thumbnail id as @id.
-        thumbnailId = item.thumbnail?.id ?? item.thumbnail["@id"];
+        thumbnailId = item.thumbnail.id ?? item.thumbnail["@id"];
     }
 
 
