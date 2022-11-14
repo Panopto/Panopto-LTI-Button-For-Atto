@@ -92,6 +92,7 @@ Y.namespace('M.atto_panoptoltibutton').EmbeddedContentRenderingStrategy = functi
         item.displayHeight = defaultHeight;
     }
 
+    var thumbnailId = '';
     if (item.thumbnail) {
         if (!item.thumbnail.width) {
             item.thumbnail.width = defaultThumbnailWidth;
@@ -107,6 +108,9 @@ Y.namespace('M.atto_panoptoltibutton').EmbeddedContentRenderingStrategy = functi
         }
 
         titleHeight = parseInt(item.thumbnail.height) + "px";
+
+        // LTI 1.3 sends thumbnail id as @id.
+        thumbnailId = item.thumbnail?.id ?? item.thumbnail["@id"];
     }
 
 
@@ -120,7 +124,7 @@ Y.namespace('M.atto_panoptoltibutton').EmbeddedContentRenderingStrategy = functi
             + 'allowfullscreen="true" '
             + '/>'
         ),
-        link: Y.Handlebars.compile('<div style="' 
+        link: Y.Handlebars.compile('<div style="'
                     + (item.displayWidth ? 'width:{{item.displayWidth}};' : '')
                     + 'height:{{titleHeight}};">'
                     + '<a href="' + M.cfg.wwwroot + '/lib/editor/atto/plugins/panoptoltibutton/view.php?custom={{custom}}&'
@@ -130,7 +134,7 @@ Y.namespace('M.atto_panoptoltibutton').EmbeddedContentRenderingStrategy = functi
                     + '{{#if item.placementAdvice.windowTarget}}target="{{item.placementAdvice.windowTarget}}" {{/if}}'
                     + '>'
                         + '{{#if item.thumbnail}}'
-                        + '<img src={{item.thumbnail.id}} alt="content thumbnail"'
+                        + '<img src={{thumbnailId}} alt="content thumbnail"'
                         + 'style="float:left;margin-right:5px;'
                         + 'width:{{item.thumbnail.width}}px;'
                         + 'height:{{item.thumbnail.height}}px;'
@@ -138,7 +142,7 @@ Y.namespace('M.atto_panoptoltibutton').EmbeddedContentRenderingStrategy = functi
                         + '{{/if}}'
                         + '<div style="float:left;font-size:20px;font-weight:bold;'
                         + (item.titleWidth ? 'width:{{titleWidth}};' : '')
-                        + 'height:{{titleHeight}};line-height:{{titleHeight}};">' 
+                        + 'height:{{titleHeight}};line-height:{{titleHeight}};">'
                         + '{{item.title}}'
                         + '</div>'
                     + '</a>'
@@ -161,7 +165,7 @@ Y.namespace('M.atto_panoptoltibutton').EmbeddedContentRenderingStrategy = functi
                     resourcelinkid: resourceLinkId,
                     course: course,
                 });
-            } 
+            }
             else {
                 alert('Unsupported application subtype');
             }
@@ -175,7 +179,8 @@ Y.namespace('M.atto_panoptoltibutton').EmbeddedContentRenderingStrategy = functi
                 resourcelnkid: resourceLinkId,
                 textHeight: textHeight,
                 titleHeight: titleHeight,
-                titleWidth: titleWidth
+                titleWidth: titleWidth,
+                thumbnailId: thumbnailId
             });
             break;
         default:
@@ -219,5 +224,4 @@ Y.namespace('M.atto_panoptoltibutton').IframeRenderingStrategy = function (item,
             ltiTypeId: tool.id
         });
     };
-
 };

@@ -25,11 +25,14 @@
 
 require_once(dirname(__FILE__) . '/../../../../../config.php');
 require_once(dirname(__FILE__) . '/lib/panoptoltibutton_lti_utility.php');
+require_once(dirname(__FILE__) . '/../../../../../mod/lti/lib.php');
+require_once(dirname(__FILE__) . '/../../../../../mod/lti/locallib.php');
 
+$courseid           = required_param('course', PARAM_INT);
+$id                 = required_param('id', PARAM_INT);
+$callback           = required_param('callback', PARAM_ALPHANUMEXT);
 
-$courseid = required_param('course', PARAM_INT);
-$callback = required_param('callback', PARAM_ALPHANUMEXT);
-$contentitemsraw = required_param('content_items', PARAM_RAW_TRIMMED);
+$jwt                = optional_param('JWT', '', PARAM_RAW);
 
 require_login($courseid);
 
@@ -41,7 +44,28 @@ if (!\panoptoltibutton_lti_utility::is_active_user_enrolled($context)) {
     require_capability('mod/lti:addcoursetool', $context);
 }
 
-$contentitems = json_decode($contentitemsraw);
+$config = lti_get_type_type_config($id);
+$islti1p3 = $config->lti_ltiversion === LTI_VERSION_1P3;
+
+if (!empty($jwt)) {
+    $params = lti_convert_from_jwt($id, $jwt);
+    $consumerkey = $params['oauth_consumer_key'] ?? '';
+    $messagetype = $params['lti_message_type'] ?? '';
+    $items = $params['content_items'] ?? '';
+    $version = $params['lti_version'] ?? '';
+    $errormsg = $params['lti_errormsg'] ?? '';
+    $msg = $params['lti_msg'] ?? '';
+} else {
+    $consumerkey = required_param('oauth_consumer_key', PARAM_RAW);
+    $messagetype = required_param('lti_message_type', PARAM_TEXT);
+    $version = required_param('lti_version', PARAM_TEXT);
+    $items = optional_param('content_items', '', PARAM_RAW_TRIMMED);
+    $errormsg = optional_param('lti_errormsg', '', PARAM_TEXT);
+    $msg = optional_param('lti_msg', '', PARAM_TEXT);
+    lti_verify_oauth_signature($id, $consumerkey);
+}
+
+$contentitems = json_decode($items);
 
 $errors = [];
 
@@ -49,6 +73,17 @@ $errors = [];
 if (!is_object($contentitems) && !is_array($contentitems)) {
     $errors[] = 'invalidjson';
 }
+
+if ($islti1p3) {
+    $doctarget = $contentitems->{'@graph'}[0]->placementAdvice->presentationDocumentTarget;
+    if ($doctarget == 'iframe') {
+        $contentitems->{'@graph'}[0]->placementAdvice->presentationDocumentTarget = 'frame';
+        $contentitems->{'@graph'}[0]->placementAdvice->windowTarget = '_blank';
+        $contentitems->{'@graph'}[0]->{'@type'} = 'ContentItem';
+        $contentitems->{'@graph'}[0]->mediaType = 'text/html';
+    }
+}
+
 ?>
 
 <script type="text/javascript">

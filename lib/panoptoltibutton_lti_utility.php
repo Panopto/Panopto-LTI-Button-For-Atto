@@ -53,7 +53,7 @@ class panoptoltibutton_lti_utility {
         if (empty($CFG)) {
             require_once(dirname(__FILE__) . '/../../../../../config.php');
         }
-        
+
         require_once($CFG->dirroot . '/mod/lti/lib.php');
         require_once($CFG->dirroot . '/mod/lti/locallib.php');
 
@@ -100,7 +100,7 @@ class panoptoltibutton_lti_utility {
         }
 
         // Setup LTI 1.3 specific parameters.
-        $lti1p3params = new \stdClass();
+        $lti1p3params = new stdClass();
         $ltiversion1p3 = defined('LTI_VERSION_1P3') && ($ltiversion === LTI_VERSION_1P3);
 
         if (isset($tool->toolproxyid)) {
@@ -112,10 +112,10 @@ class panoptoltibutton_lti_utility {
                 if (!empty($toolproxy->public_keyset_url)) {
                     $lti1p3params->lti_publickeyset = $toolproxy->public_keyset_url;
                 }
-                $lti1p3params->lti_keytype = LTI_JWK_KEYSET;
+                $lti1p3params->lti_keytype = JWK_KEYSET;
 
-                if (!empty($toolproxy->launch_url)) {
-                    $lti1p3params->lti_initiatelogin = $toolproxy->launch_url;
+                if (!empty($toolproxy->initiatelogin)) {
+                    $lti1p3params->lti_initiatelogin = $toolproxy->initiatelogin;
                 }
                 if (!empty($toolproxy->redirection_uris)) {
                     $lti1p3params->lti_redirectionuris = $toolproxy->redirection_uris;
@@ -127,16 +127,16 @@ class panoptoltibutton_lti_utility {
                 $key = $instance->resourcekey;
             } else if ($ltiversion1p3) {
                 $key = $tool->clientid;
-                if (!empty($instance->public_keyset_url)) {
-                    $lti1p3params->lti_publickeyset = $instance->public_keyset_url;
+                if (!empty($typeconfig['publickeyset'])) {
+                    $lti1p3params->lti_publickeyset = $typeconfig['publickeyset'];
                 }
-                $lti1p3params->lti_keytype = LTI_JWK_KEYSET;
+                $lti1p3params->lti_keytype = $typeconfig['keytype'] ?? JWK_KEYSET;
 
-                if (!empty($instance->launch_url)) {
-                    $lti1p3params->lti_initiatelogin = $instance->launch_url;
+                if (!empty($typeconfig['initiatelogin'])) {
+                    $lti1p3params->lti_initiatelogin = $typeconfig['initiatelogin'];
                 }
-                if (!empty($instance->redirection_uris)) {
-                    $lti1p3params->lti_redirectionuris = $instance->redirection_uris;
+                if (!empty($typeconfig['redirectionuris'])) {
+                    $lti1p3params->lti_redirectionuris = $typeconfig['redirectionuris'];
                 }
             } else if (!empty($typeconfig['resourcekey'])) {
                 $key = $typeconfig['resourcekey'];
@@ -275,7 +275,7 @@ class panoptoltibutton_lti_utility {
 
         if ((!empty($key) && !empty($secret)) || $ltiversion1p3) {
 
-            // lti_sign_jwt was not added until 3.7 so we need to support the original style of processing this. 
+            // lti_sign_jwt was not added until 3.7 so we need to support the original style of processing this.
             if (defined('LTI_VERSION_1P3') && function_exists('lti_sign_jwt')) {
                 if ($ltiversion !== LTI_VERSION_1P3) {
                     $parms = lti_sign_parameters($requestparams, $endpoint, 'POST', $key, $secret);
@@ -308,7 +308,7 @@ class panoptoltibutton_lti_utility {
     }
 
     public static function is_active_user_enrolled($targetcontext) {
-        global $USER; 
+        global $USER;
 
         return is_enrolled($targetcontext, $USER, 'mod/assignment:submit');
     }

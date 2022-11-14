@@ -34,8 +34,6 @@ function init_panoptoltibutton_view() {
     require_once($CFG->dirroot . '/mod/lti/locallib.php');
     require_once(dirname(__FILE__) . '/lib/panoptoltibutton_lti_utility.php');
 
-    $contenturl = optional_param('contenturl', '', PARAM_URL);
-    
     $configuredserverarray = panopto_get_configured_panopto_servers();
 
     $contenturl = optional_param('contenturl', '', PARAM_URL);
@@ -68,6 +66,7 @@ function init_panoptoltibutton_view() {
         $lti = new stdClass();
 
         // Try to detect if we are viewing content from an iframe nested in course, get the Id param if it exists.
+        $courseid = '';
         if (!empty($_SERVER['HTTP_REFERER']) && (strpos($_SERVER['HTTP_REFERER'], "/course/view.php") !== false)) {
             $components = parse_url($_SERVER['HTTP_REFERER']);
             parse_str($components['query'], $results);
@@ -75,10 +74,14 @@ function init_panoptoltibutton_view() {
             if (!empty($results['id'])) {
                 $lti->course = $results['id'];
                 $course = $DB->get_record('course', array('id' => $results['id']), '*', MUST_EXIST);
+                $courseid = $course->id;
                 $context = context_course::instance($results['id']);
                 $PAGE->set_context($context);
                 require_login($course, true);
             }
+        } else {
+            parse_str(parse_url($_SERVER['HTTP_REFERER'], PHP_URL_QUERY), $queries);
+            $courseid = $queries['course'];
         }
 
         $lti->id = $resourcelinkid;
@@ -90,12 +93,25 @@ function init_panoptoltibutton_view() {
         $lti->debuglaunch = false;
         if ($customdata) {
             $decoded = json_decode($customdata, true);
-            
+
             foreach ($decoded as $key => $value) {
                 $lti->custom->$key = $value;
             }
         }
-        
+
+        // LTI 1.3 login request.
+        $config = lti_get_type_type_config($ltitypeid);
+        if ($config->lti_ltiversion === LTI_VERSION_1P3) {
+            if (!isset($SESSION->lti_initiatelogin_status)) {
+                echo lti_initiate_login($courseid,
+                    "atto_panoptoltibutton,'',{$ltitypeid},{$resourcelinkid},{$contenturl},{$customdata}",
+                    $lti,
+                    $config
+                );
+                exit;
+            }
+        }
+
         \panoptoltibutton_lti_utility::launch_tool($lti);
     } else {
         echo get_string('invalid_content_host', 'atto_panoptoltibutton');
