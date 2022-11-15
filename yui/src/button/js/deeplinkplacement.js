@@ -72,7 +72,7 @@ Y.namespace('M.atto_panoptoltibutton').PlacementStrategyFactory = function () {
 Y.namespace('M.atto_panoptoltibutton').EmbeddedContentRenderingStrategy = function (item,
         course, resourceLinkId, tool) {
 
-    var mimeTypePieces = item.mediaType.split("\\/"),
+    var mimeTypePieces = item.mediaType.split("/"),
         mimeTypeType = mimeTypePieces[0],
         defaultHeight = "250px",
         defaultThumbnailWidth = 128,

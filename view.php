@@ -79,9 +79,6 @@ function init_panoptoltibutton_view() {
                 $PAGE->set_context($context);
                 require_login($course, true);
             }
-        } else {
-            parse_str(parse_url($_SERVER['HTTP_REFERER'], PHP_URL_QUERY), $queries);
-            $courseid = $queries['course'];
         }
 
         $lti->id = $resourcelinkid;

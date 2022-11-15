@@ -75,8 +75,10 @@ if (!is_object($contentitems) && !is_array($contentitems)) {
 }
 
 if ($islti1p3) {
+    // Update content items data if this is lti 1.3 and not embed.
     $doctarget = $contentitems->{'@graph'}[0]->placementAdvice->presentationDocumentTarget;
-    if ($doctarget == 'iframe') {
+    $thumbnail = $contentitems->{'@graph'}[0]->thumbnail;
+    if ($doctarget == 'iframe' && !empty($thumbnail)) {
         $contentitems->{'@graph'}[0]->placementAdvice->presentationDocumentTarget = 'frame';
         $contentitems->{'@graph'}[0]->placementAdvice->windowTarget = '_blank';
         $contentitems->{'@graph'}[0]->{'@type'} = 'ContentItem';
