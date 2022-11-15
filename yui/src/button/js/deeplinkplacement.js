@@ -72,7 +72,7 @@ Y.namespace('M.atto_panoptoltibutton').PlacementStrategyFactory = function () {
 Y.namespace('M.atto_panoptoltibutton').EmbeddedContentRenderingStrategy = function (item,
         course, resourceLinkId, tool) {
 
-    var mimeTypePieces = item.mediaType.split('/'),
+    var mimeTypePieces = item.mediaType.split("\\/"),
         mimeTypeType = mimeTypePieces[0],
         defaultHeight = "250px",
         defaultThumbnailWidth = 128,
@@ -110,7 +110,7 @@ Y.namespace('M.atto_panoptoltibutton').EmbeddedContentRenderingStrategy = functi
         titleHeight = parseInt(item.thumbnail.height) + "px";
 
         // LTI 1.3 sends thumbnail id as @id.
-        thumbnailId = item.thumbnail.id ?? item.thumbnail["@id"];
+        thumbnailId = item.thumbnail.id ? item.thumbnail.id : item.thumbnail["@id"];
     }
 
 
