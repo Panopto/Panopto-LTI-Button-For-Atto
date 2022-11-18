@@ -24,9 +24,9 @@
  */
 
 require_once(dirname(__FILE__) . '/../../../../../config.php');
-require_once(dirname(__FILE__) . '/lib/panoptoltibutton_lti_utility.php');
-require_once(dirname(__FILE__) . '/../../../../../mod/lti/lib.php');
-require_once(dirname(__FILE__) . '/../../../../../mod/lti/locallib.php');
+require_once($CFG->dirroot . '/blocks/panopto/lib/lti/panoptoblock_lti_utility.php');
+require_once($CFG->dirroot . '/mod/lti/lib.php');
+require_once($CFG->dirroot . '/mod/lti/locallib.php');
 
 $courseid           = required_param('course', PARAM_INT);
 $id                 = required_param('id', PARAM_INT);
@@ -39,7 +39,7 @@ require_login($courseid);
 $context = context_course::instance($courseid);
 
 // Students will access this tool for the student submission workflow. Assume student can submit an assignment?
-if (!\panoptoltibutton_lti_utility::is_active_user_enrolled($context)) {
+if (!\panoptoblock_lti_utility::is_active_user_enrolled($context)) {
     require_capability('moodle/course:manageactivities', $context);
     require_capability('mod/lti:addcoursetool', $context);
 }
@@ -62,7 +62,6 @@ if (!empty($jwt)) {
     $items = optional_param('content_items', '', PARAM_RAW_TRIMMED);
     $errormsg = optional_param('lti_errormsg', '', PARAM_TEXT);
     $msg = optional_param('lti_msg', '', PARAM_TEXT);
-    lti_verify_oauth_signature($id, $consumerkey);
 }
 
 $contentitems = json_decode($items);
@@ -75,8 +74,12 @@ if (!is_object($contentitems) && !is_array($contentitems)) {
 }
 
 if ($islti1p3) {
-    $doctarget = $contentitems->{'@graph'}[0]->placementAdvice->presentationDocumentTarget;
-    if ($doctarget == 'iframe') {
+    // Update content items data if this is lti 1.3 and not embed.
+    $doctarget = $contentitems->{'@graph'}[0]->placementAdvice->presentationDocumentTarget
+                    ? $contentitems->{'@graph'}[0]->placementAdvice->presentationDocumentTarget
+                    : ($contentitems->{'@graph'}[0]->iframe ? "iframe" : "frame");
+    $thumbnail = $contentitems->{'@graph'}[0]->thumbnail;
+    if ($doctarget == 'iframe' && !empty($thumbnail)) {
         $contentitems->{'@graph'}[0]->placementAdvice->presentationDocumentTarget = 'frame';
         $contentitems->{'@graph'}[0]->placementAdvice->windowTarget = '_blank';
         $contentitems->{'@graph'}[0]->{'@type'} = 'ContentItem';

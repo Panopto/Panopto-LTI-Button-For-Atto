@@ -32,7 +32,7 @@ function init_panoptoltibutton_view() {
     require_once($CFG->libdir .'/accesslib.php'); // Access control functions
     require_once($CFG->dirroot . '/mod/lti/lib.php');
     require_once($CFG->dirroot . '/mod/lti/locallib.php');
-    require_once(dirname(__FILE__) . '/lib/panoptoltibutton_lti_utility.php');
+    require_once($CFG->dirroot . '/blocks/panopto/lib/lti/panoptoblock_lti_utility.php');
 
     $configuredserverarray = panopto_get_configured_panopto_servers();
 
@@ -79,9 +79,6 @@ function init_panoptoltibutton_view() {
                 $PAGE->set_context($context);
                 require_login($course, true);
             }
-        } else {
-            parse_str(parse_url($_SERVER['HTTP_REFERER'], PHP_URL_QUERY), $queries);
-            $courseid = $queries['course'];
         }
 
         $lti->id = $resourcelinkid;
@@ -112,7 +109,7 @@ function init_panoptoltibutton_view() {
             }
         }
 
-        \panoptoltibutton_lti_utility::launch_tool($lti);
+        echo \panoptoblock_lti_utility::launch_tool($lti);
     } else {
         echo get_string('invalid_content_host', 'atto_panoptoltibutton');
     }

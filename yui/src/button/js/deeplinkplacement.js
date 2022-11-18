@@ -38,13 +38,19 @@ Y.namespace('M.atto_panoptoltibutton').PlacementStrategyFactory = function () {
 
         var StrategyClass = Y.M.atto_panoptoltibutton.EmbeddedContentRenderingStrategy;
 
-        if (item.mediaType === 'application/vnd.ims.lti.v1.ltilink'
-                || item.placementAdvice) {
+        if (   item.mediaType === 'application/vnd.ims.lti.v1.ltilink'
+               || item.mediaType === 'application\\/vnd.ims.lti.v1.ltilink'
+               || item.placementAdvice) {
             StrategyClass = Y.M.atto_panoptoltibutton.IframeRenderingStrategy;
 
-            if (item.placementAdvice) {
+            if (item.placementAdvice || item.iframe) {
+                let presentationTarget = item.placementAdvice?.presentationDocumentTarget
+                    ? item.placementAdvice.presentationDocumentTarget
+                    : item.thumbnail
+                        ? "frame"
+                        : "iframe";
 
-                switch (item.placementAdvice.presentationDocumentTarget) {
+                switch (presentationTarget) {
                     case 'iframe':
                         StrategyClass = Y.M.atto_panoptoltibutton.IframeRenderingStrategy;
                         break;
@@ -72,7 +78,7 @@ Y.namespace('M.atto_panoptoltibutton').PlacementStrategyFactory = function () {
 Y.namespace('M.atto_panoptoltibutton').EmbeddedContentRenderingStrategy = function (item,
         course, resourceLinkId, tool) {
 
-    var mimeTypePieces = item.mediaType.split('/'),
+    var mimeTypePieces = item.mediaType.split("/"),
         mimeTypeType = mimeTypePieces[0],
         defaultHeight = "250px",
         defaultThumbnailWidth = 128,
@@ -110,7 +116,7 @@ Y.namespace('M.atto_panoptoltibutton').EmbeddedContentRenderingStrategy = functi
         titleHeight = parseInt(item.thumbnail.height) + "px";
 
         // LTI 1.3 sends thumbnail id as @id.
-        thumbnailId = item.thumbnail.id ?? item.thumbnail["@id"];
+        thumbnailId = item.thumbnail.id ? item.thumbnail.id : item.thumbnail["@id"];
     }
 
 
@@ -155,6 +161,8 @@ Y.namespace('M.atto_panoptoltibutton').EmbeddedContentRenderingStrategy = functi
         )
     };
 
+    // Remove backslashes for the LTI 1.3
+    mimeTypeType = mimeTypeType.replace(/\\/g, "");
     switch (mimeTypeType) {
         case 'application':
             if (mimeTypePieces[1] === 'vnd.ims.lti.v1.ltilink') {
@@ -205,12 +213,20 @@ Y.namespace('M.atto_panoptoltibutton').IframeRenderingStrategy = function (item,
         item.useCustomUrl = true;
     }
 
+    let displayWidth = item.placementAdvice?.displayWidth
+        ? item.placementAdvice.displayWidth
+        : item.iframe?.width;
+
+    let displayHeight = item.placementAdvice?.displayHeight
+        ? item.placementAdvice.displayHeight
+        : item.iframe?.height;
+
     template = Y.Handlebars.compile('<iframe src="' + M.cfg.wwwroot + '/lib/editor/atto/plugins/panoptoltibutton/view.php?course={{courseId}}'
             + '&ltitypeid={{ltiTypeId}}&custom={{custom}}'
             + '{{#if item.useCustomUrl}}&contenturl={{item.url}}{{/if}}'
             + '&resourcelinkid={{resourcelinkid}}" '
-            + ' {{#if item.placementAdvice.displayWidth}}width="{{item.placementAdvice.displayWidth}}" {{/if}}'
-            + ' {{#if item.placementAdvice.displayHeight}}height="{{item.placementAdvice.displayHeight}}" {{/if}}'
+            + ' {{#if displayWidth}}width="{{displayWidth}}" {{/if}}'
+            + ' {{#if displayHeight}}height="{{displayHeight}}" {{/if}}'
             + 'allowfullscreen="true" '
             + '></iframe>'
             );
@@ -221,7 +237,9 @@ Y.namespace('M.atto_panoptoltibutton').IframeRenderingStrategy = function (item,
             custom: JSON.stringify(item.custom),
             courseId: course.id,
             resourcelinkid: resourceLinkId,
-            ltiTypeId: tool.id
+            ltiTypeId: tool.id,
+            displayHeight: displayHeight,
+            displayWidth: displayWidth,
         });
     };
 };
