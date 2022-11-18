@@ -109,7 +109,7 @@ function init_panoptoltibutton_view() {
             }
         }
 
-        \panoptoblock_lti_utility::launch_tool($lti);
+        echo \panoptoblock_lti_utility::launch_tool($lti);
     } else {
         echo get_string('invalid_content_host', 'atto_panoptoltibutton');
     }

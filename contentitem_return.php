@@ -62,7 +62,6 @@ if (!empty($jwt)) {
     $items = optional_param('content_items', '', PARAM_RAW_TRIMMED);
     $errormsg = optional_param('lti_errormsg', '', PARAM_TEXT);
     $msg = optional_param('lti_msg', '', PARAM_TEXT);
-    lti_verify_oauth_signature($id, $consumerkey);
 }
 
 $contentitems = json_decode($items);
@@ -76,7 +75,9 @@ if (!is_object($contentitems) && !is_array($contentitems)) {
 
 if ($islti1p3) {
     // Update content items data if this is lti 1.3 and not embed.
-    $doctarget = $contentitems->{'@graph'}[0]->placementAdvice->presentationDocumentTarget;
+    $doctarget = $contentitems->{'@graph'}[0]->placementAdvice->presentationDocumentTarget
+                    ? $contentitems->{'@graph'}[0]->placementAdvice->presentationDocumentTarget
+                    : ($contentitems->{'@graph'}[0]->iframe ? "iframe" : "frame");
     $thumbnail = $contentitems->{'@graph'}[0]->thumbnail;
     if ($doctarget == 'iframe' && !empty($thumbnail)) {
         $contentitems->{'@graph'}[0]->placementAdvice->presentationDocumentTarget = 'frame';
