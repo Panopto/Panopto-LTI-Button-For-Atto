@@ -24,14 +24,23 @@
  */
 
 require_once(dirname(__FILE__) . '/../../../../../config.php');
-require_once(dirname(__FILE__) . '/lib/panoptoltibutton_lti_utility.php');
-require_once(dirname(__FILE__) . '/../../../../../mod/lti/lib.php');
-require_once(dirname(__FILE__) . '/../../../../../mod/lti/locallib.php');
+require_once($CFG->dirroot . '/blocks/panopto/lib/lti/panoptoblock_lti_utility.php');
+require_once($CFG->dirroot . '/mod/lti/lib.php');
+require_once($CFG->dirroot . '/mod/lti/locallib.php');
 
 
 $id = required_param('id', PARAM_INT);
 $courseid = required_param('course', PARAM_INT);
 $callback = required_param('callback', PARAM_ALPHANUMEXT);
+
+// LTI 1.3 login request.
+$config = lti_get_type_type_config($id);
+if ($config->lti_ltiversion === LTI_VERSION_1P3) {
+    if (!isset($SESSION->lti_initiatelogin_status)) {
+        echo lti_initiate_login($courseid, "atto_panoptoltibutton, {$callback}", null, $config);
+        exit;
+    }
+}
 
 // Check access and capabilities.
 $course = get_course($courseid);
@@ -39,7 +48,7 @@ require_login($course);
 $context = context_course::instance($courseid);
 
 // Students will access this tool for the student submission workflow. Assume student can submit an assignment?
-if (!\panoptoltibutton_lti_utility::is_active_user_enrolled($context)) {
+if (!\panoptoblock_lti_utility::is_active_user_enrolled($context)) {
     require_capability('moodle/course:manageactivities', $context);
     require_capability('mod/lti:addcoursetool', $context);
 }
@@ -56,8 +65,7 @@ $returnurl = new \moodle_url('/lib/editor/atto/plugins/panoptoltibutton/contenti
 
 // Prepare the request.
 $request = lti_build_content_item_selection_request(
-    $id, $course, $returnurl, '', '', [], [],
-    false, false, false, false, false
+    $id, $course, $returnurl, '', '', [], [], false, false, false, false, false
 );
 
 // Get the launch HTML.
