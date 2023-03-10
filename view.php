@@ -66,7 +66,7 @@ function init_panoptoltibutton_view() {
         $lti = new stdClass();
 
         // Try to detect if we are viewing content from an iframe nested in course, get the Id param if it exists.
-        $courseid = '';
+        $courseid = 0;
         if (!empty($_SERVER['HTTP_REFERER']) && (strpos($_SERVER['HTTP_REFERER'], "/course/view.php") !== false)) {
             $components = parse_url($_SERVER['HTTP_REFERER']);
             parse_str($components['query'], $results);
