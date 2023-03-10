@@ -38,6 +38,10 @@ $callback   = required_param('callback', PARAM_ALPHANUMEXT);
  */
 const LTI_ATTO_PATH = '/lib/editor/atto/plugins/panoptoltibutton/contentitem_return.php';
 
+// Check access and capabilities.
+$course = get_course($courseid);
+require_login($course);
+
 // LTI 1.3 login request.
 $isthismoodle41 = empty($CFG->version) ? false : $CFG->version >= 2022112800.00;
 $config = lti_get_type_type_config($id);
@@ -62,9 +66,6 @@ if ($config->lti_ltiversion === LTI_VERSION_1P3) {
     }
 }
 
-// Check access and capabilities.
-$course = get_course($courseid);
-require_login($course);
 $context = context_course::instance($courseid);
 
 // Students will access this tool for the student submission workflow. Assume student can submit an assignment?
