@@ -38,15 +38,6 @@ $callback   = required_param('callback', PARAM_ALPHANUMEXT);
  */
 const LTI_ATTO_PATH = '/lib/editor/atto/plugins/panoptoltibutton/contentitem_return.php';
 
-// LTI 1.3 login request.
-$config = lti_get_type_type_config($id);
-if ($config->lti_ltiversion === LTI_VERSION_1P3) {
-    if (!isset($SESSION->lti_initiatelogin_status)) {
-        echo lti_initiate_login($courseid, "atto_panoptoltibutton, {$callback}", null, $config);
-        exit;
-    }
-}
-
 // Check access and capabilities.
 $course = get_course($courseid);
 require_login($course);
