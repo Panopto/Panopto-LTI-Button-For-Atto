@@ -52,10 +52,12 @@ function atto_panoptoltibutton_params_for_js($elementid, $options, $fpoptions) {
     require_once($CFG->dirroot . '/mod/lti/lib.php');
     require_once($CFG->dirroot . '/mod/lti/locallib.php');
 
-    $ltitooltypes = $DB->get_records('lti_types', null, 'name');
-
     $targetservername = $DB->get_field('block_panopto_foldermap', 'panopto_server', array('moodleid' => $PAGE->course->id));
-    
+
+    $ltitooltypes = !empty($targetservername)
+        ? $DB->get_records('lti_types', ['tooldomain' => $targetservername], 'name')
+        : $DB->get_records('lti_types', null, 'name');
+
     $tooltypes = [];
     foreach ($ltitooltypes as $type) {
         $type->config = lti_get_config(
@@ -64,12 +66,14 @@ function atto_panoptoltibutton_params_for_js($elementid, $options, $fpoptions) {
             ]
         );
 
-        if (!empty($targetservername) && strpos($type->config['toolurl'], $targetservername) !== false && 
-                $type->state == LTI_TOOL_STATE_CONFIGURED) {
+        // Match the tool, make sure it is in configured state and course visible.
+        if (!empty($targetservername) && strpos($type->config['toolurl'], $targetservername) !== false
+                && $type->state == LTI_TOOL_STATE_CONFIGURED
+                && $type->coursevisible != LTI_COURSEVISIBLE_NO) {
+
             $tooltypes[] = $type;
         }
     }
-
 
     return [
         'toolTypes' => $tooltypes,
