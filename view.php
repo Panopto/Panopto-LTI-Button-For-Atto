@@ -28,7 +28,7 @@ if (empty($CFG)) {
     require_once(dirname(__FILE__) . '/../../../../../config.php');
 }
 require_once($CFG->dirroot . '/blocks/panopto/lib/block_panopto_lib.php');
-require_once($CFG->libdir  . '/accesslib.php'); // Access control functions
+require_once($CFG->libdir  . '/accesslib.php'); // Access control functions.
 require_once($CFG->dirroot . '/mod/lti/lib.php');
 require_once($CFG->dirroot . '/mod/lti/locallib.php');
 require_once($CFG->dirroot . '/blocks/panopto/lib/lti/panoptoblock_lti_utility.php');
@@ -40,7 +40,7 @@ $contenturl = optional_param('contenturl', '', PARAM_URL);
 $contentverified = false;
 
 if ($contenturl) {
-    foreach($configuredserverarray as  $possibleserver) {
+    foreach ($configuredserverarray as $possibleserver) {
         $contenthost = parse_url($contenturl, PHP_URL_HOST);
 
         if (stripos($contenthost, $possibleserver) !== false) {
@@ -72,7 +72,7 @@ if ($contentverified) {
 
         if (!empty($results['id'])) {
             $lti->course = $results['id'];
-            $course = $DB->get_record('course', array('id' => $results['id']), '*', MUST_EXIST);
+            $course = $DB->get_record('course', ['id' => $results['id']], '*', MUST_EXIST);
             $courseid = $course->id;
             $context = context_course::instance($results['id']);
             $PAGE->set_context($context);
@@ -112,4 +112,3 @@ if ($contentverified) {
 } else {
     echo get_string('invalid_content_host', 'atto_panoptoltibutton');
 }
-

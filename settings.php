@@ -15,28 +15,28 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- *
- * Atto text editor LTI integration for Panopto LTI tools
+ * This file represents main settings for the plugin.
  *
  * @package    atto_panoptoltibutton
- * @copyright  2020 - Panopto
- * @author     Panopto
+ * @copyright  2024 Panopto
+ * @author     Panopto with contributions from David Shepard
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+
 defined('MOODLE_INTERNAL') || die();
 
-// The current plugin version (Date: YYYYMMDDXX).
-$plugin->version = 2024012500;
+$ADMIN->add('editoratto', new admin_category('atto_panoptoltibutton', new lang_string('pluginname', 'atto_panoptoltibutton')));
 
-// Requires this Moodle version - 3.9.0.
-$plugin->requires = 2020061500;
-
-// Full name of the plugin (used for diagnostics).
-$plugin->component = 'atto_panoptoltibutton';
-
-// Dependencies.
-$plugin->dependencies = [
-    'block_panopto' => 2022122000,
-    'mod_lti' => ANY_VERSION,
-];
+$settings = new admin_settingpage('atto_panoptoltibutton_settings', new lang_string('settings', 'atto_panoptoltibutton'));
+if ($ADMIN->fulltree) {
+    // An option setting.
+    $settings->add(
+        new admin_setting_configcheckbox(
+            'atto_panoptoltibutton/is_responsive',
+            get_string('is_responsive', 'atto_panoptoltibutton'),
+            get_string('is_responsive_desc', 'atto_panoptoltibutton'),
+            0
+        )
+    );
+}
