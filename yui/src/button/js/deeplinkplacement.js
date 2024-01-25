@@ -34,7 +34,7 @@
 
 Y.namespace('M.atto_panoptoltibutton').PlacementStrategyFactory = function () {
 
-    this.strategyFor = function (item, course, resourceLinkId, tool) {
+    this.strategyFor = function (item, course, resourceLinkId, tool, isResponsive) {
 
         var StrategyClass = Y.M.atto_panoptoltibutton.EmbeddedContentRenderingStrategy;
 
@@ -69,14 +69,14 @@ Y.namespace('M.atto_panoptoltibutton').PlacementStrategyFactory = function () {
             }
         }
 
-        var strategy = new StrategyClass(item, course, resourceLinkId, tool);
+        var strategy = new StrategyClass(item, course, resourceLinkId, tool, isResponsive);
 
         return strategy;
     };
 };
 
 Y.namespace('M.atto_panoptoltibutton').EmbeddedContentRenderingStrategy = function (item,
-        course, resourceLinkId, tool) {
+        course, resourceLinkId, tool, isResponsive) {
 
     var mimeTypePieces = item.mediaType.split("/"),
         mimeTypeType = mimeTypePieces[0],
@@ -121,15 +121,19 @@ Y.namespace('M.atto_panoptoltibutton').EmbeddedContentRenderingStrategy = functi
 
 
     TEMPLATES = {
-        ltiLink: Y.Handlebars.compile('<iframe src="' + M.cfg.wwwroot + '/lib/editor/atto/plugins/panoptoltibutton/view.php?custom={{custom}}&'
-            + 'course={{course.id}}&ltitypeid={{toolid}}&resourcelinkid={{resourcelinkid}}'
-            + '{{#if item.url}}&contenturl={{item.url}}{{/if}}'
-            + '" '
-            + '{{#if item.placementAdvice.width}} width="{{item.placementAdvice.displayWidth}}"{{/if}} '
-            + '{{#if item.placementAdvice.height}} height="{{item.placementAdvice.displayHeight}}"{{/if}} '
-            + 'allowfullscreen="true" '
-            + '/>'
-        ),
+        ltiLink: Y.Handlebars.compile(`
+            <iframe src="${M.cfg.wwwroot}/lib/editor/atto/plugins/panoptoltibutton/view.php?custom={{custom}}
+                &course={{course.id}}&ltitypeid={{toolid}}&resourcelinkid={{resourcelinkid}}
+                {{#if item.url}}&contenturl={{item.url}}{{/if}}"
+                {{#if isResponsive}}
+                style="width: 100%; height: auto; aspect-ratio: 16 / 9;"
+                {{else}}
+                {{#if item.placementAdvice.width}} width="{{item.placementAdvice.displayWidth}}"{{/if}}
+                {{#if item.placementAdvice.height}} height="{{item.placementAdvice.displayHeight}}"{{/if}}
+                {{/if}}
+                allowfullscreen="true">
+            </iframe>
+        `),
         link: Y.Handlebars.compile('<div style="'
                     + (item.displayWidth ? 'width:{{item.displayWidth}};' : '')
                     + 'height:{{titleHeight}};">'
@@ -172,6 +176,7 @@ Y.namespace('M.atto_panoptoltibutton').EmbeddedContentRenderingStrategy = functi
                     toolid: tool.id,
                     resourcelinkid: resourceLinkId,
                     course: course,
+                    isResponsive: isResponsive,
                 });
             }
             else {
@@ -202,7 +207,7 @@ Y.namespace('M.atto_panoptoltibutton').EmbeddedContentRenderingStrategy = functi
 };
 
 Y.namespace('M.atto_panoptoltibutton').IframeRenderingStrategy = function (item, course,
-        resourceLinkId, tool) {
+        resourceLinkId, tool, isResponsive) {
 
     var template;
 
@@ -221,15 +226,19 @@ Y.namespace('M.atto_panoptoltibutton').IframeRenderingStrategy = function (item,
         ? item.placementAdvice.displayHeight
         : item.iframe?.height;
 
-    template = Y.Handlebars.compile('<iframe src="' + M.cfg.wwwroot + '/lib/editor/atto/plugins/panoptoltibutton/view.php?course={{courseId}}'
-            + '&ltitypeid={{ltiTypeId}}&custom={{custom}}'
-            + '{{#if item.useCustomUrl}}&contenturl={{item.url}}{{/if}}'
-            + '&resourcelinkid={{resourcelinkid}}" '
-            + ' {{#if displayWidth}}width="{{displayWidth}}" {{/if}}'
-            + ' {{#if displayHeight}}height="{{displayHeight}}" {{/if}}'
-            + 'allowfullscreen="true" '
-            + '></iframe>'
-            );
+    template = Y.Handlebars.compile(`
+        <iframe src="${M.cfg.wwwroot}/lib/editor/atto/plugins/panoptoltibutton/view.php?course={{courseId}}
+            &ltitypeid={{ltiTypeId}}&custom={{custom}}
+            {{#if item.useCustomUrl}}&contenturl={{item.url}}{{/if}}
+            &resourcelinkid={{resourcelinkid}}"
+            {{#if isResponsive}}
+            style="width: 100%; height: auto; aspect-ratio: 16 / 9;"
+            {{else}}
+            style="{{#if displayWidth}}width: {{displayWidth}}px;{{/if}}{{#if displayHeight}} height: {{displayHeight}}px;{{/if}}"
+            {{/if}}
+            allowfullscreen="true">
+        </iframe>
+    `);
 
     this.toHtml = function () {
         return template({
@@ -240,6 +249,7 @@ Y.namespace('M.atto_panoptoltibutton').IframeRenderingStrategy = function (item,
             ltiTypeId: tool.id,
             displayHeight: displayHeight,
             displayWidth: displayWidth,
+            isResponsive: isResponsive,
         });
     };
 };

@@ -64,7 +64,8 @@ Y.namespace('M.atto_panoptoltibutton').Button = Y.Base.create('button', Y.M.edit
         var resourceLinkId = this._createResourceLinkId(),
             host = this.get('host'),
             panel,
-            courseid = this._course;
+            courseid = this._course,
+            isResponsive = this._isResponsive;
 
         document.CALLBACKS['f' + resourceLinkId] = function (contentItemData) {
             if (!contentItemData) {
@@ -74,7 +75,7 @@ Y.namespace('M.atto_panoptoltibutton').Button = Y.Base.create('button', Y.M.edit
             for (var i = 0; i < contentItemData['@graph'].length; i++) {
                 var item = contentItemData['@graph'][i];
                 var strategyFactory = new Y.M.atto_panoptoltibutton.PlacementStrategyFactory();
-                var strategy = strategyFactory.strategyFor(item, courseid, resourceLinkId, tool);
+                var strategy = strategyFactory.strategyFor(item, courseid, resourceLinkId, tool, isResponsive);
                 var render = strategy.toHtml;
                 host.insertContentAtFocusPoint(render(item));
             }
@@ -107,12 +108,13 @@ Y.namespace('M.atto_panoptoltibutton').Button = Y.Base.create('button', Y.M.edit
     },
 
     initializer: function (args) {
-        if (!args.toolTypes || args.toolTypes.length === 0) {
+        // If we don't have tool or capability is disabled, just quit.
+        if (!args.toolTypes || args.toolTypes.length === 0 || args.disabled) {
             return;
         }
 
         this._course = args.course;
-
+        this._isResponsive = args.isResponsive;
 
         this._createResourceLinkId = (function (base) {
             return function () {
@@ -120,23 +122,31 @@ Y.namespace('M.atto_panoptoltibutton').Button = Y.Base.create('button', Y.M.edit
             };
         }(args.resourcebase));
 
-        this.addToolbarMenu({
+        if (args.toolTypes.length > 1) {
+             this.addToolbarMenu({
+                 icon: "ed/iconone",
+                 iconComponent: "atto_panoptoltibutton",
 
-            icon: 'ed/iconone',
-            iconComponent: 'atto_panoptoltibutton',
+                 globalItemConfig: {
+                     callback: this._addTool,
+                 },
 
-            globalItemConfig:{
-                callback: this._addTool
-            },
-
-            items: args.toolTypes.map(function (args) {
-                return {
-                    text : args.name,
-                    callbackArgs: args
-                };
-            })
-        });
-
+                 items: args.toolTypes.map(function (args) {
+                     return {
+                         text: args.name,
+                         callbackArgs: args,
+                     };
+                 }),
+             });
+        } else if (args.toolTypes.length === 1) {
+            // Code to add a single button for one tool
+            this.addButton({
+                icon: "ed/iconone",
+                iconComponent: "atto_panoptoltibutton",
+                text: args.toolTypes[0].name ?? 'Panopto LTI',
+                callback: this._addTool,
+                callbackArgs: args.toolTypes[0],
+            });
+        }
     }
-
 });

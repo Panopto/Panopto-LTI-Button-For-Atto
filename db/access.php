@@ -15,28 +15,26 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- *
- * Atto text editor LTI integration for Panopto LTI tools
+ * Plugin capabilities
  *
  * @package    atto_panoptoltibutton
- * @copyright  2020 - Panopto
+ * @copyright  2020 Panopto
  * @author     Panopto
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-// The current plugin version (Date: YYYYMMDDXX).
-$plugin->version = 2024012500;
-
-// Requires this Moodle version - 3.9.0.
-$plugin->requires = 2020061500;
-
-// Full name of the plugin (used for diagnostics).
-$plugin->component = 'atto_panoptoltibutton';
-
-// Dependencies.
-$plugin->dependencies = [
-    'block_panopto' => 2022122000,
-    'mod_lti' => ANY_VERSION,
+$capabilities = [
+    'atto/panoptoltibutton:visible' => [
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes' => [
+            'coursecreator' => CAP_ALLOW,
+            'teacher' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'student' => CAP_ALLOW,
+            'manager' => CAP_ALLOW,
+        ],
+    ],
 ];

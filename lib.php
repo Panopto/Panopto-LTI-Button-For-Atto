@@ -44,7 +44,7 @@ function atto_panoptoltibutton_strings_for_js() {
  * @return array of additional params to pass to javascript init function for this module.
  */
 function atto_panoptoltibutton_params_for_js($elementid, $options, $fpoptions) {
-    global $PAGE, $DB, $CFG;
+    global $PAGE, $DB, $CFG, $COURSE;
 
     if (empty($CFG)) {
         require_once(dirname(__FILE__) . '/../../../../../config.php');
@@ -52,7 +52,8 @@ function atto_panoptoltibutton_params_for_js($elementid, $options, $fpoptions) {
     require_once($CFG->dirroot . '/mod/lti/lib.php');
     require_once($CFG->dirroot . '/mod/lti/locallib.php');
 
-    $targetservername = $DB->get_field('block_panopto_foldermap', 'panopto_server', array('moodleid' => $PAGE->course->id));
+    $coursecontext = context_course::instance($COURSE->id);
+    $targetservername = $DB->get_field('block_panopto_foldermap', 'panopto_server', ['moodleid' => $PAGE->course->id]);
 
     $ltitooltypes = !empty($targetservername)
         ? $DB->get_records('lti_types', ['tooldomain' => $targetservername], 'name')
@@ -75,12 +76,25 @@ function atto_panoptoltibutton_params_for_js($elementid, $options, $fpoptions) {
         }
     }
 
+    // If they don't have permission don't show it.
+    $disabled = false;
+    if (!has_capability('atto/panoptoltibutton:visible', $coursecontext)) {
+        $disabled = true;
+    }
+
+    $isresponsive = false;
+    if (get_config('atto_panoptoltibutton', 'is_responsive')) {
+        $isresponsive = true;
+    }
+
     return [
         'toolTypes' => $tooltypes,
         'course' => $PAGE->course,
+        'disabled' => $disabled,
         'resourcebase' => sha1(
             $PAGE->url->__toString() . '&' . $PAGE->course->sortorder
                 . '&' . $PAGE->course->timecreated
         ),
+        'isResponsive' => $isresponsive,
     ];
 }
