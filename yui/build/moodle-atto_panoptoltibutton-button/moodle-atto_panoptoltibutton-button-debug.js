@@ -291,25 +291,31 @@ Y.namespace('M.atto_panoptoltibutton').IframeRenderingStrategy = function (item,
  */
 
 
-require(['core/str'], function (str) {
+require(["core/str"], function (str) {
+    let errorMessage = null;
+    const stringPromise = str.get_string(
+        "erroroccurred",
+        "atto_panoptoltibutton"
+    );
 
-    var errorMessage = null,
-        stringPromise = str.get_string('erroroccurred', 'atto_panoptoltibutton');
-
-    $.when(stringPromise).done(function (invalid) {
-        errorMessage = invalid;
-    });
+    stringPromise
+        .then(function (invalid) {
+            errorMessage = invalid;
+        })
+        .catch(function (error) {
+            console.error("Error loading string:", error);
+        });
 
     document.CALLBACKS = {
         handleError: function (errors) {
             alert(errorMessage);
-            for (var i = 0; i < errors.length; i++) {
+            for (let i = 0; i < errors.length; i++) {
                 console.error(errors[i]);
             }
-        }
+        },
     };
-
 });
+
 
 Y.namespace('M.atto_panoptoltibutton').Button = Y.Base.create('button', Y.M.editor_atto.EditorPlugin, [], {
     _CONTENT_ITEM_SELECTION_URL: M.cfg.wwwroot + '/lib/editor/atto/plugins/panoptoltibutton/contentitem.php',

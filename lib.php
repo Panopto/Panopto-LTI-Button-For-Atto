@@ -55,9 +55,14 @@ function atto_panoptoltibutton_params_for_js($elementid, $options, $fpoptions) {
     $coursecontext = context_course::instance($COURSE->id);
     $targetservername = $DB->get_field('block_panopto_foldermap', 'panopto_server', ['moodleid' => $PAGE->course->id]);
 
+    // If the course is not provisioned with the Panopto block, retrieve the default Panopto server FQDN.
+    if (empty($targetservername)) {
+        $targetservername = get_config('block_panopto', 'automatic_operation_target_server');
+    }
+
     $ltitooltypes = !empty($targetservername)
         ? $DB->get_records('lti_types', ['tooldomain' => $targetservername], 'name')
-        : $DB->get_records('lti_types', null, 'name');
+        : atto_get_filtered_lti_tool_types();
 
     $tooltypes = [];
     foreach ($ltitooltypes as $type) {
@@ -98,3 +103,32 @@ function atto_panoptoltibutton_params_for_js($elementid, $options, $fpoptions) {
         'isResponsive' => $isresponsive,
     ];
 }
+
+/**
+ * Return filtered lti tool types
+ * @return mixed
+ */
+function atto_get_filtered_lti_tool_types() {
+    global $DB, $CFG;
+    require_once($CFG->dirroot . '/mod/lti/locallib.php');
+
+    $sql = "
+        SELECT *
+        FROM {lti_types} lt
+        WHERE lt.state = :state
+        AND (
+            lt.baseurl LIKE :panopto_com_pattern
+            OR lt.baseurl LIKE :panopto_eu_pattern
+        )";
+
+    // Since we don't have targeted server, let's use baseurl for filtering.
+    $params = [
+        'state' => LTI_TOOL_STATE_CONFIGURED,
+        'panopto_com_pattern' => '%.panopto.com%',
+        'panopto_eu_pattern' => '%.panopto.eu%',
+    ];
+
+    $tooltypes = $DB->get_records_sql($sql, $params);
+
+    return $tooltypes;
+};
