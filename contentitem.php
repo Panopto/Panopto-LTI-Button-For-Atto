@@ -40,7 +40,6 @@ const LTI_ATTO_PATH = '/lib/editor/atto/plugins/panoptoltibutton/contentitem_ret
 
 // Check access and capabilities.
 $course = get_course($courseid);
-require_login($course);
 
 // LTI 1.3 login request.
 $isthismoodle41 = empty($CFG->version) ? false : $CFG->version >= 2022112800.00;
@@ -63,8 +62,12 @@ if ($config->lti_ltiversion === LTI_VERSION_1P3) {
     if (!isset($SESSION->lti_initiatelogin_status)) {
         echo lti_initiate_login($courseid, "atto_panoptoltibutton, {$callback}", $lti, $config);
         exit;
+    } else {
+        unset($SESSION->lti_initiatelogin_status);
     }
 }
+
+require_login($course);
 
 $context = context_course::instance($courseid);
 
