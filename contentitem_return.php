@@ -24,6 +24,7 @@
  */
 
 require_once(dirname(__FILE__) . '/../../../../../config.php');
+require_once(dirname(__FILE__) . '/lib.php');
 require_once($CFG->dirroot . '/blocks/panopto/lib/lti/panoptoblock_lti_utility.php');
 require_once($CFG->dirroot . '/mod/lti/lib.php');
 require_once($CFG->dirroot . '/mod/lti/locallib.php');
@@ -34,7 +35,7 @@ $callback           = required_param('callback', PARAM_ALPHANUMEXT);
 
 $jwt                = optional_param('JWT', '', PARAM_RAW);
 
-require_login($courseid);
+atto_panoptoltibutton_require_login_or_repost($courseid);
 
 $context = context_course::instance($courseid);
 

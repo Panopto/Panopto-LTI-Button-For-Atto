@@ -57,8 +57,6 @@ if ($contentverified) {
     $ltitypeid = required_param('ltitypeid', PARAM_INT);
     $customdata = optional_param('custom', '', PARAM_RAW_TRIMMED);
 
-    require_login();
-
     // Make sure $ltitypeid is valid.
     $ltitype = $DB->get_record('lti_types', ['id' => $ltitypeid], '*', MUST_EXIST);
 
@@ -76,7 +74,6 @@ if ($contentverified) {
             $courseid = $course->id;
             $context = context_course::instance($results['id']);
             $PAGE->set_context($context);
-            require_login($course, true);
         }
     }
 
@@ -105,7 +102,15 @@ if ($contentverified) {
                 $config
             );
             exit;
+        } else {
+            unset($SESSION->lti_initiatelogin_status);
         }
+    }
+
+    if (!empty($courseid)) {
+        require_login($course, true);
+    } else {
+        require_login();
     }
 
     echo \panoptoblock_lti_utility::launch_tool($lti);
